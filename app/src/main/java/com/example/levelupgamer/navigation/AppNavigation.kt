@@ -17,5 +17,8 @@ fun AppNavigation() {
     ) {
         composable("splash") { SplashScreen(navController) }
         composable("login") { LoginScreen(navController) }
+        composable("catalogo") { CatalogScreen(navController) }
+        composable("registro") { RegisterScreen(navController) }
+
     }
 }

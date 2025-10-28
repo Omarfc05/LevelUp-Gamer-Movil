@@ -1,5 +1,6 @@
 package com.example.levelupgamer.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -17,24 +18,29 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
-        delay(2000) // espera 2 segundos
+        delay(2000)
         navController.navigate("login")
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("💻 LevelUp - Gamer", fontSize = 30.sp, color = Color.Blue)
+            Text(
+                text = "💻 LevelUp - Gamer",
+                fontSize = 30.sp,
+                color = MaterialTheme.colorScheme.primary // Azul eléctrico
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Cargando...", fontSize = 16.sp)
+            Text(
+                text = "Cargando...",
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onBackground // Blanco
+            )
         }
     }
-
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    )
-
 }
+
