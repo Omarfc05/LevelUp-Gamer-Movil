@@ -1,5 +1,8 @@
 package com.example.levelupgamer.model
 
 data class Product(
-    val nombre: String
+    val id: Int,
+    val name: String,
+    val price: Double,
+    val imageRes: Int // referencia a drawable
 )
