@@ -26,7 +26,7 @@ class LoginViewModel : ViewModel() {
     }
 
     fun login() {
-        // 🔹 Simulación simple de login (más adelante puedes usar Firebase o tu API)
+        // 🔹 Simulación simple de login
         if (email == "admin@levelup.com" && password == "1234") {
             loginSuccess = true
         } else {

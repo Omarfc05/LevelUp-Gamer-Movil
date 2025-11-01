@@ -7,6 +7,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import com.example.levelupgamer.navigation.AppNavigation
+
 import com.example.levelupgamer.ui.theme.LevelUpGamerTheme
 
 class MainActivity : ComponentActivity() {
