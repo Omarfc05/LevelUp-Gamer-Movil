@@ -1,36 +1,21 @@
 package com.example.levelupgamer.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.levelupgamer.model.User
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
+import com.example.levelupgamer.data.repository.UserRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
-    var email by mutableStateOf("")
-        private set
+    private val _loginResult = MutableStateFlow<Boolean?>(null)
+    val loginResult: StateFlow<Boolean?> get() = _loginResult
 
-    var password by mutableStateOf("")
-        private set
-
-    var loginSuccess by mutableStateOf(false)
-        private set
-
-    fun onEmailChange(newEmail: String) {
-        email = newEmail
-    }
-
-    fun onPasswordChange(newPassword: String) {
-        password = newPassword
-    }
-
-    fun login() {
-        // 🔹 Simulación simple de login
-        if (email == "admin@levelup.com" && password == "1234") {
-            loginSuccess = true
-        } else {
-            loginSuccess = false
+    fun login(email: String, password: String) {
+        viewModelScope.launch {
+            val user = repository.login(email, password)
+            _loginResult.value = user != null
         }
     }
 }
