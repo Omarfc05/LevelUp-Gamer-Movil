@@ -1,6 +1,6 @@
 package com.example.levelupgamer.ui.screen
 
-// --- ASEGÚRATE DE TENER ESTAS IMPORTACIONES ---
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,32 +26,32 @@ import com.example.levelupgamer.ui.theme.Orbitron
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
-        delay(2000) // espera 2 segundos
+        delay(2000)
         navController.navigate("login")
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black), // Asumo que aquí tienes tu color personalizado
+            .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-            // 1. AQUÍ AGREGAS LA IMAGEN
+
             Image(
-                painter = painterResource(id = R.drawable.logo), // <-- CAMBIA ESTO por tu logo
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo de LevelUp Gamer",
-                modifier = Modifier.size(120.dp) // <-- Ajusta el tamaño como quieras
+                modifier = Modifier.size(120.dp)
             )
 
-            // 2. Un espacio extra entre la imagen y el texto
-            Spacer(modifier = Modifier.height(16.dp)) // <-- Spacer agregado
 
-            // 3. Tu texto existente
+            Spacer(modifier = Modifier.height(16.dp))
+
+
             Text("💻 LevelUp - Gamer", fontSize = 30.sp, color = ElectricBlue, fontFamily = Orbitron)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Cargando...", fontSize = 16.sp, color = LightGrayText) // Ajusta el color si es necesario
+            Text("Cargando...", fontSize = 16.sp, color = LightGrayText)
         }
     }
 
