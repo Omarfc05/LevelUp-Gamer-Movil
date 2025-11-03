@@ -27,13 +27,13 @@ class AuthViewModel(
         }
     }
 
-    fun register(nombre: String, email: String, password: String, fotoPerfil: String?) {
+    fun register(name: String, email: String, password: String, imageUri: String?) {
         viewModelScope.launch {
             val result = userRepository.registerUser(
-                User(nombre = nombre, email = email, password = password, fotoPerfil = fotoPerfil)
+                User(nombre = name, email = email, password = password, fotoPerfil = imageUri)
             )
             _authState.value = if (result.isSuccess) AuthState.RegisterSuccess
-            else AuthState.Error(result.exceptionOrNull()?.message ?: "Error al registrar")
+            else AuthState.Error(result.exceptionOrNull()?.message ?: "Error")
         }
     }
 
@@ -42,19 +42,25 @@ class AuthViewModel(
             val result = userRepository.login(email, password)
             if (result.isSuccess) {
                 val user = result.getOrNull()!!
-                val cu = CurrentUser(
+                val current = CurrentUser(
                     userId = user.id,
                     email = user.email,
                     nombre = user.nombre,
                     fotoPerfil = user.fotoPerfil
                 )
-                currentUserRepository.setCurrentUser(cu)
-                _currentUser.value = cu
+                currentUserRepository.setCurrentUser(current)
+                _currentUser.value = current
                 _authState.value = AuthState.LoginSuccess
             } else {
                 _authState.value = AuthState.Error("Credenciales inválidas")
             }
         }
+    }
+
+    suspend fun loadCurrentUser(): CurrentUser? {
+        val user = currentUserRepository.getCurrentUser()
+        _currentUser.value = user
+        return user
     }
 
     fun logout() {

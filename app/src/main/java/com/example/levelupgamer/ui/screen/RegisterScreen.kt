@@ -151,10 +151,10 @@ fun RegisterScreen(
                         else -> {
                             errorMessage = null
                             authViewModel.register(
-                                nombre = nombre,
+                                name = nombre,
                                 email = email,
                                 password = password,
-                                fotoPerfil = fotoUri?.toString()
+                                imageUri = fotoUri?.toString()
                             )
                         }
                     }

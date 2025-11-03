@@ -38,6 +38,12 @@ fun ProfileScreen(
     val coroutineScope = rememberCoroutineScope()
     var currentUser by remember { mutableStateOf(authViewModel.currentUser.value) }
 
+    // 🔹 Carga automática desde la base de datos
+    LaunchedEffect(Unit) {
+        val user = authViewModel.loadCurrentUser()
+        currentUser = user
+    }
+
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -98,7 +104,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botón cambiar foto
             Button(
                 onClick = { imagePicker.launch("image/*") },
                 colors = ButtonDefaults.buttonColors(containerColor = ElectricBlue)
@@ -108,7 +113,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Botón cerrar sesión
             Button(
                 onClick = {
                     coroutineScope.launch {
