@@ -5,9 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "users")
 data class User(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val nombre: String,
     val email: String,
     val password: String,
-    val fotoUri: String? = null // URI de la foto de perfil (opcional)
+    val fotoPerfil: String? = null // URI de la imagen de perfil (puede ser null)
 )

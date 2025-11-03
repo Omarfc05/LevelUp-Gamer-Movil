@@ -17,8 +17,6 @@ import com.example.levelupgamer.viewmodel.ProductViewModel
 @Composable
 fun AppNavigation(navController: NavHostController) {
     val context = LocalContext.current
-
-    // Inicializa la base de datos y los repositorios
     val db = AppDatabase.getDatabase(context)
     val userRepo = UserRepository(db.userDao())
     val currentUserRepo = CurrentUserRepository(db.currentUserDao())
@@ -31,25 +29,21 @@ fun AppNavigation(navController: NavHostController) {
         composable("splash") {
             SplashScreen(navController)
         }
-
         composable("login") {
             val authViewModel: AuthViewModel = viewModel(factory = authFactory)
             LoginScreen(navController = navController, authViewModel = authViewModel)
         }
-
         composable("register") {
             val authViewModel: AuthViewModel = viewModel(factory = authFactory)
             RegisterScreen(navController = navController, authViewModel = authViewModel)
         }
-
         composable("catalog") {
             val productViewModel: ProductViewModel = viewModel()
             CatalogScreen(viewModel = productViewModel, navController = navController)
         }
-
         composable("profile") {
             val authViewModel: AuthViewModel = viewModel(factory = authFactory)
-            ProfileScreen(authViewModel = authViewModel)
+            ProfileScreen(authViewModel = authViewModel, navController = navController)
         }
     }
 }

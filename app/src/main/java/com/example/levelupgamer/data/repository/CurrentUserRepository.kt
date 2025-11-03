@@ -5,7 +5,17 @@ import com.example.levelupgamer.data.local.entity.CurrentUser
 
 class CurrentUserRepository(private val currentUserDao: CurrentUserDao) {
 
-    suspend fun setCurrentUser(user: CurrentUser) = currentUserDao.setCurrentUser(user)
-    suspend fun getCurrentUser(): CurrentUser? = currentUserDao.getCurrentUser()
-    suspend fun logout() = currentUserDao.logout()
+    suspend fun setCurrentUser(user: CurrentUser) {
+        currentUserDao.clear()
+        currentUserDao.insertCurrentUser(user)
+    }
+
+    suspend fun getCurrentUser(): CurrentUser? {
+        return currentUserDao.getCurrentUser()
+    }
+
+    suspend fun logout() {
+        currentUserDao.clear()
+    }
 }
+

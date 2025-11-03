@@ -1,6 +1,7 @@
 package com.example.levelupgamer.ui.screen
 
 import android.net.Uri
+import android.util.Patterns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -31,6 +33,7 @@ fun RegisterScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var fotoUri by remember { mutableStateOf<Uri?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val authState by authViewModel.authState.collectAsState()
 
@@ -53,7 +56,7 @@ fun RegisterScreen(
             Text(
                 "Registro de Usuario",
                 color = WhiteText,
-                fontSize = 24.sp,
+                fontSize = 26.sp,
                 style = MaterialTheme.typography.titleLarge
             )
 
@@ -83,6 +86,7 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(24.dp))
 
+            // Nombre
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
@@ -100,6 +104,7 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(16.dp))
 
+            // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -117,6 +122,7 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(16.dp))
 
+            // Contraseña
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -137,17 +143,35 @@ fun RegisterScreen(
 
             Button(
                 onClick = {
-                    authViewModel.register(
-                        name = nombre,
-                        email = email,
-                        password = password,
-                        imageUri = fotoUri?.toString()
-                    )
+                    when {
+                        nombre.isBlank() -> errorMessage = "El nombre no puede estar vacío"
+                        email.isBlank() -> errorMessage = "El correo no puede estar vacío"
+                        !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> errorMessage = "Correo no válido"
+                        password.length < 6 -> errorMessage = "La contraseña debe tener al menos 6 caracteres"
+                        else -> {
+                            errorMessage = null
+                            authViewModel.register(
+                                nombre = nombre,
+                                email = email,
+                                password = password,
+                                fotoPerfil = fotoUri?.toString()
+                            )
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = ElectricBlue)
             ) {
                 Text("Registrar", color = WhiteText)
+            }
+
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage ?: "",
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 12.dp),
+                    textAlign = TextAlign.Center
+                )
             }
 
             Spacer(Modifier.height(12.dp))
@@ -168,7 +192,8 @@ fun RegisterScreen(
                     Text(
                         text = (authState as AuthState.Error).message,
                         color = Color.Red,
-                        modifier = Modifier.padding(top = 12.dp)
+                        modifier = Modifier.padding(top = 12.dp),
+                        textAlign = TextAlign.Center
                     )
                 }
                 else -> {}

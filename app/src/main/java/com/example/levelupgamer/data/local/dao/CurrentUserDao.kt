@@ -10,11 +10,11 @@ import com.example.levelupgamer.data.local.entity.CurrentUser
 interface CurrentUserDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun setCurrentUser(user: CurrentUser)
+    suspend fun insertCurrentUser(user: CurrentUser)
 
     @Query("SELECT * FROM current_user LIMIT 1")
     suspend fun getCurrentUser(): CurrentUser?
 
     @Query("DELETE FROM current_user")
-    suspend fun logout()
+    suspend fun clear()
 }

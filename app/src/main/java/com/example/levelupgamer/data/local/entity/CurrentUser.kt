@@ -5,8 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "current_user")
 data class CurrentUser(
-    @PrimaryKey val userId: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val userId: Int,
     val email: String,
-    val name: String,
-    val profileImageUri: String?
+    val nombre: String,
+    val fotoPerfil: String? = null
 )

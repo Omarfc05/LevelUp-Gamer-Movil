@@ -11,7 +11,7 @@ import com.example.levelupgamer.data.local.entity.User
 
 @Database(
     entities = [User::class, CurrentUser::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
