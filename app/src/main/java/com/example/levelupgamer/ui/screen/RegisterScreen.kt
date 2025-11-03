@@ -1,141 +1,177 @@
 package com.example.levelupgamer.ui.screen
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.levelupgamer.ui.theme.*
+import com.example.levelupgamer.viewmodel.AuthState
+import com.example.levelupgamer.viewmodel.AuthViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController) {
-
+fun RegisterScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel
+) {
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    var fotoUri by remember { mutableStateOf<Uri?>(null) }
 
-    Surface(
+    val authState by authViewModel.authState.collectAsState()
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? -> fotoUri = uri }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(BlackBackground),
-        color = BlackBackground
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
+                .padding(24.dp)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Text(
-                text = "CREAR CUENTA",
-                color = NeonGreen,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Center
+                "Registro de Usuario",
+                color = WhiteText,
+                fontSize = 24.sp,
+                style = MaterialTheme.typography.titleLarge
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Nombre
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clickable { launcher.launch("image/*") },
+                contentAlignment = Alignment.Center
+            ) {
+                if (fotoUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(fotoUri),
+                        contentDescription = "Foto de perfil",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(120.dp)
+                    )
+                } else {
+                    Text(
+                        "Seleccionar foto",
+                        color = ElectricBlue,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
-                label = { Text("Nombre de usuario", color = LightGrayText) },
-                singleLine = true,
+                label = { Text("Nombre", color = LightGrayText) },
+                modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = NeonGreen,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedBorderColor = ElectricBlue,
                     unfocusedBorderColor = LightGrayText,
-                    cursorColor = NeonGreen,
                     focusedTextColor = WhiteText,
                     unfocusedTextColor = WhiteText
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Correo electrónico", color = LightGrayText) },
-                singleLine = true,
+                label = { Text("Email", color = LightGrayText) },
+                modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = NeonGreen,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedBorderColor = ElectricBlue,
                     unfocusedBorderColor = LightGrayText,
-                    cursorColor = NeonGreen,
                     focusedTextColor = WhiteText,
                     unfocusedTextColor = WhiteText
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Contraseña
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Contraseña", color = LightGrayText) },
-                singleLine = true,
-                visualTransformation = if (passwordVisible)
-                    VisualTransformation.None
-                else PasswordVisualTransformation(),
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = NeonGreen,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedBorderColor = ElectricBlue,
                     unfocusedBorderColor = LightGrayText,
-                    cursorColor = NeonGreen,
                     focusedTextColor = WhiteText,
                     unfocusedTextColor = WhiteText
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // Botón de registro
             Button(
                 onClick = {
-                    if (nombre.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                        // Aquí podrías guardar el usuario en ViewModel o BD
-                        navController.navigate("login")
-                    }
+                    authViewModel.register(
+                        name = nombre,
+                        email = email,
+                        password = password,
+                        imageUri = fotoUri?.toString()
+                    )
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = NeonGreen,
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(12.dp)
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = ElectricBlue)
             ) {
-                Text("REGISTRARME", fontWeight = FontWeight.Bold)
+                Text("Registrar", color = WhiteText)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
 
             TextButton(onClick = { navController.navigate("login") }) {
-                Text(
-                    text = "¿Ya tienes cuenta? Inicia sesión",
-                    color = ElectricBlue,
-                    fontSize = 14.sp
-                )
+                Text("¿Ya tienes cuenta? Inicia sesión", color = NeonGreen)
+            }
+
+            when (authState) {
+                is AuthState.RegisterSuccess -> {
+                    LaunchedEffect(Unit) {
+                        navController.navigate("login") {
+                            popUpTo("register") { inclusive = true }
+                        }
+                    }
+                }
+                is AuthState.Error -> {
+                    Text(
+                        text = (authState as AuthState.Error).message,
+                        color = Color.Red,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+                }
+                else -> {}
             }
         }
     }

@@ -2,137 +2,116 @@ package com.example.levelupgamer.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.levelupgamer.ui.theme.*
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import com.example.levelupgamer.ui.theme.Orbitron
-
-
-
+import com.example.levelupgamer.viewmodel.AuthViewModel
+import com.example.levelupgamer.viewmodel.AuthState
 
 @Composable
-fun LoginScreen(navController: NavController) {
-
+fun LoginScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    val authState by authViewModel.authState.collectAsState()
 
-    Surface(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(BlackBackground),
-        color = BlackBackground
+        contentAlignment = Alignment.Center
     ) {
         Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(24.dp)
+                .fillMaxWidth()
         ) {
-
-            // 🕹️ Título principal
             Text(
-                text = "Level-Up Gamer",
-                color = ElectricBlue,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = Orbitron,
-                textAlign = TextAlign.Center
+                text = "Iniciar Sesión",
+                color = WhiteText,
+                style = MaterialTheme.typography.titleLarge
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(Modifier.height(32.dp))
 
-            Text(
-                text = "Inicia sesión para continuar",
-                color = LightGrayText,
-                fontSize = 16.sp
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // ✉️ Campo de correo
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Correo electrónico", color = LightGrayText) },
-                singleLine = true,
+                label = { Text("Email", color = LightGrayText) },
+                modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
                     focusedBorderColor = ElectricBlue,
                     unfocusedBorderColor = LightGrayText,
-                    cursorColor = ElectricBlue,
                     focusedTextColor = WhiteText,
                     unfocusedTextColor = WhiteText
                 ),
-                        modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // 🔒 Campo de contraseña
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Contraseña", color = LightGrayText) },
-                singleLine = true,
-                visualTransformation = if (passwordVisible)
-                    VisualTransformation.None
-                else PasswordVisualTransformation(),
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
                     focusedBorderColor = ElectricBlue,
                     unfocusedBorderColor = LightGrayText,
-                    cursorColor = ElectricBlue,
                     focusedTextColor = WhiteText,
                     unfocusedTextColor = WhiteText
                 ),
-                        modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // 🔘 Botón Login
             Button(
-                onClick = {
-                    if (email == "admin@levelup.com" && password == "1234") {
-                        navController.navigate("catalog")
-                    } else {
-                        // En caso de error, podrías mostrar un snackbar o mensaje
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ElectricBlue,
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(12.dp)
+                onClick = { authViewModel.login(email, password) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = ElectricBlue)
             ) {
-                Text("INICIAR SESIÓN", fontWeight = FontWeight.Bold)
+                Text("Ingresar", color = WhiteText)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
 
-            // 🧩 Link de registro
             TextButton(onClick = { navController.navigate("register") }) {
-                Text(
-                    text = "¿No tienes cuenta? Regístrate",
-                    color = NeonGreen,
-                    fontSize = 14.sp
-                )
+                Text("¿No tienes cuenta? Regístrate", color = NeonGreen)
+            }
+
+            when (authState) {
+                is AuthState.LoginSuccess -> {
+                    LaunchedEffect(Unit) {
+                        navController.navigate("catalog") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                }
+                is AuthState.Error -> {
+                    Text(
+                        text = (authState as AuthState.Error).message,
+                        color = Color.Red,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+                }
+                else -> {}
             }
         }
     }
