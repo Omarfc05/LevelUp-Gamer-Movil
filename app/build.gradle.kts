@@ -9,6 +9,12 @@ android {
     namespace = "com.example.levelupgamer"
     compileSdk = 36
 
+    testOptions {
+        animationsDisabled = true
+    }
+
+
+
     defaultConfig {
         applicationId = "com.example.levelupgamer"
         minSdk = 24
@@ -63,6 +69,12 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("io.coil-kt:coil-compose:2.0.0")
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.0")
+
+    // Para usar Navigation en pruebas
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.5")
+
 
 
 }
