@@ -1,6 +1,7 @@
 package com.example.levelupgamer.ui.screen
 
 import android.net.Uri
+import androidx.compose.ui.platform.testTag
 import android.util.Patterns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -91,7 +92,8 @@ fun RegisterScreen(
                 value = nombre,
                 onValueChange = { nombre = it },
                 label = { Text("Nombre", color = LightGrayText) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                .testTag("txt_nombre"),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -109,7 +111,8 @@ fun RegisterScreen(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email", color = LightGrayText) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                .testTag("txt_email"),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -128,7 +131,9 @@ fun RegisterScreen(
                 onValueChange = { password = it },
                 label = { Text("Contraseña", color = LightGrayText) },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                .fillMaxWidth()
+                .testTag("txt_password"),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -159,7 +164,8 @@ fun RegisterScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .testTag("btn_registrar"),
                 colors = ButtonDefaults.buttonColors(containerColor = ElectricBlue)
             ) {
                 Text("Registrar", color = WhiteText)
@@ -169,7 +175,9 @@ fun RegisterScreen(
                 Text(
                     text = errorMessage ?: "",
                     color = Color.Red,
-                    modifier = Modifier.padding(top = 12.dp),
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .testTag("lbl_error"),
                     textAlign = TextAlign.Center
                 )
             }
