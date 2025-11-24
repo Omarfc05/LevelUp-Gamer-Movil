@@ -75,6 +75,11 @@ dependencies {
     // Para usar Navigation en pruebas
     androidTestImplementation("androidx.navigation:navigation-testing:2.7.5")
 
+    //API COSAS
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
 
 
 }
