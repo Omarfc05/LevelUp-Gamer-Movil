@@ -265,7 +265,7 @@ fun ApiProductCard(apiProduct: ApiProduct) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp),
+            .height(240.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF0F0F0F))
     ) {
         Column(
@@ -273,14 +273,13 @@ fun ApiProductCard(apiProduct: ApiProduct) {
                 .fillMaxSize()
                 .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly
+            verticalArrangement = Arrangement.SpaceAround
         ) {
             Image(
-                painter = rememberAsyncImagePainter(apiProduct.image),
+                painter = rememberAsyncImagePainter(apiProduct.thumbnail),
                 contentDescription = apiProduct.title,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(90.dp)
             )
-
             Text(
                 text = apiProduct.title,
                 color = WhiteText,
@@ -288,9 +287,8 @@ fun ApiProductCard(apiProduct: ApiProduct) {
                 fontWeight = FontWeight.Bold,
                 maxLines = 2
             )
-
             Text(
-                text = "${apiProduct.price} USD",
+                text = "Gratis",
                 color = ElectricBlue,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
@@ -298,3 +296,4 @@ fun ApiProductCard(apiProduct: ApiProduct) {
         }
     }
 }
+
