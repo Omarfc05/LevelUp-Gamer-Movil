@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,6 +25,7 @@ import com.example.levelupgamer.model.Product
 import com.example.levelupgamer.ui.components.CatalogTopBar
 import com.example.levelupgamer.ui.theme.*
 import com.example.levelupgamer.viewmodel.ApiProductViewModel
+import com.example.levelupgamer.viewmodel.AuthViewModel
 import com.example.levelupgamer.viewmodel.CartViewModel
 import com.example.levelupgamer.viewmodel.ProductViewModel
 import kotlinx.coroutines.launch
@@ -33,13 +35,17 @@ fun CatalogScreen(
     viewModel: ProductViewModel = viewModel(),
     apiViewModel: ApiProductViewModel = viewModel(),
     navController: NavController,
-    cartViewModel: CartViewModel
+    cartViewModel: CartViewModel,
+    authViewModel: AuthViewModel
 ) {
     val localProducts = viewModel.products
     val apiProducts by apiViewModel.apiProducts.collectAsState()
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val currentUser by authViewModel.currentUser.collectAsState()
+    val isAdmin = currentUser?.email == "admin@levelup.com"
 
     Scaffold(
         topBar = { CatalogTopBar(navController) },
@@ -58,6 +64,7 @@ fun CatalogScreen(
                 .background(BlackBackground)
         ) {
 
+            // Título sección local
             item(span = { GridItemSpan(2) }) {
                 Text(
                     text = "Nuestros productos",
@@ -68,7 +75,9 @@ fun CatalogScreen(
                 )
             }
 
-            items(localProducts) { product ->
+            // Productos locales (con índice para poder editar)
+            items(localProducts.size) { index ->
+                val product = localProducts[index]
                 LocalProductCard(
                     product = product,
                     onAdd = {
@@ -76,10 +85,18 @@ fun CatalogScreen(
                         scope.launch {
                             snackbarHostState.showSnackbar("✅ ${product.name} agregado al carrito")
                         }
+                    },
+                    isAdmin = isAdmin,
+                    onUpdateProduct = { newName, newPrice ->
+                        viewModel.updateProduct(index, newName, newPrice)
+                        scope.launch {
+                            snackbarHostState.showSnackbar("✏️ Producto actualizado")
+                        }
                     }
                 )
             }
 
+            // Título sección API
             item(span = { GridItemSpan(2) }) {
                 Text(
                     text = "De nuestros proveedores",
@@ -90,6 +107,7 @@ fun CatalogScreen(
                 )
             }
 
+            // Mensaje de carga de API
             if (apiProducts.isEmpty()) {
                 item(span = { GridItemSpan(2) }) {
                     Text(
@@ -99,6 +117,7 @@ fun CatalogScreen(
                     )
                 }
             } else {
+                // Productos desde la API (solo vista)
                 items(apiProducts) { apiProduct ->
                     ApiProductCard(apiProduct)
                 }
@@ -112,12 +131,19 @@ fun CatalogScreen(
 @Composable
 fun LocalProductCard(
     product: Product,
-    onAdd: () -> Unit
+    onAdd: () -> Unit,
+    isAdmin: Boolean,
+    onUpdateProduct: (String, String) -> Unit
 ) {
+    var showEdit by remember { mutableStateOf(false) }
+    var editedName by remember { mutableStateOf(product.name) }
+    var editedPrice by remember { mutableStateOf(product.price) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp),
+            .height(240.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF111111))
     ) {
         Column(
@@ -148,14 +174,89 @@ fun LocalProductCard(
                 )
             }
 
-            Button(
-                onClick = onAdd,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = NeonGreen)
-            ) {
-                Text("Agregar", color = BlackBackground, fontWeight = FontWeight.Bold)
+            Column {
+                Button(
+                    onClick = onAdd,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = NeonGreen)
+                ) {
+                    Text("Agregar", color = BlackBackground, fontWeight = FontWeight.Bold)
+                }
+
+                if (isAdmin) {
+                    TextButton(
+                        onClick = {
+                            errorMessage = null
+                            editedName = product.name
+                            editedPrice = product.price
+                            showEdit = true
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text("Editar", color = ElectricBlue, fontSize = 12.sp)
+                    }
+                }
             }
         }
+    }
+
+    if (showEdit) {
+        AlertDialog(
+            onDismissRequest = { showEdit = false },
+            title = { Text("Editar producto") },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = editedName,
+                        onValueChange = { editedName = it },
+                        label = { Text("Nombre") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = editedPrice,
+                        onValueChange = { editedPrice = it },
+                        label = { Text("Precio (solo números y puntos)") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (errorMessage != null) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = errorMessage ?: "",
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        when {
+                            editedName.isBlank() ->
+                                errorMessage = "El nombre no puede estar vacío"
+                            editedPrice.isBlank() ->
+                                errorMessage = "El precio no puede estar vacío"
+                            else -> {
+                                errorMessage = null
+                                onUpdateProduct(editedName, editedPrice)
+                                showEdit = false
+                            }
+                        }
+                    }
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEdit = false }) {
+                    Text("Cancelar")
+                }
+            },
+            containerColor = BlackBackground
+        )
     }
 }
 
