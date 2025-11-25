@@ -1,14 +1,17 @@
 package com.example.levelupgamer.ui.screen
 
 import android.net.Uri
-import androidx.compose.ui.platform.testTag
 import android.util.Patterns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,10 +45,27 @@ fun RegisterScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? -> fotoUri = uri }
 
+
+    val isFormValid = remember(nombre, email, password) {
+        nombre.isNotBlank() &&
+                email.isNotBlank() &&
+                Patterns.EMAIL_ADDRESS.matcher(email).matches() &&
+                password.length >= 6
+    }
+
+
+    val animatedBgColor by animateColorAsState(
+        targetValue = if (isFormValid && errorMessage == null)
+            BlackBackground.copy(alpha = 0.9f)
+        else
+            BlackBackground,
+        label = "formBackgroundColor"
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BlackBackground),
+            .background(animatedBgColor),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -61,7 +81,27 @@ fun RegisterScreen(
                 style = MaterialTheme.typography.titleLarge
             )
 
-            Spacer(Modifier.height(16.dp))
+
+            AnimatedVisibility(visible = isFormValid && errorMessage == null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Formulario válido",
+                        tint = NeonGreen
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "Formulario listo para enviar",
+                        color = NeonGreen,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
 
             Box(
                 modifier = Modifier
@@ -87,13 +127,11 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Nombre
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
                 label = { Text("Nombre", color = LightGrayText) },
-                modifier = Modifier.fillMaxWidth()
-                .testTag("txt_nombre"),
+                modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -106,13 +144,11 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email", color = LightGrayText) },
-                modifier = Modifier.fillMaxWidth()
-                .testTag("txt_email"),
+                modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -125,15 +161,12 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // Contraseña
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Contraseña", color = LightGrayText) },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier
-                .fillMaxWidth()
-                .testTag("txt_password"),
+                modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -145,6 +178,15 @@ fun RegisterScreen(
             )
 
             Spacer(Modifier.height(24.dp))
+
+            // ▶️ Botón animado: se ilumina cuando es válido
+            val buttonColor by animateColorAsState(
+                targetValue = if (isFormValid && errorMessage == null)
+                    NeonGreen
+                else
+                    ElectricBlue.copy(alpha = 0.6f),
+                label = "registerButtonColor"
+            )
 
             Button(
                 onClick = {
@@ -164,9 +206,12 @@ fun RegisterScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
-                    .testTag("btn_registrar"),
-                colors = ButtonDefaults.buttonColors(containerColor = ElectricBlue)
+                modifier = Modifier.fillMaxWidth(),
+                enabled = isFormValid,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = buttonColor,
+                    disabledContainerColor = ElectricBlue.copy(alpha = 0.4f)
+                )
             ) {
                 Text("Registrar", color = WhiteText)
             }
@@ -175,9 +220,7 @@ fun RegisterScreen(
                 Text(
                     text = errorMessage ?: "",
                     color = Color.Red,
-                    modifier = Modifier
-                        .padding(top = 12.dp)
-                        .testTag("lbl_error"),
+                    modifier = Modifier.padding(top = 12.dp),
                     textAlign = TextAlign.Center
                 )
             }
