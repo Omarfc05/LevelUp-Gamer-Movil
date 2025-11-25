@@ -23,7 +23,7 @@ fun CatalogTopBar(navController: NavController) {
     TopAppBar(
         title = {
             Text(
-                text = "LevelUp - Gamer",
+                text = "LevelUp | Catálogo",
                 color = WhiteText,
                 style = MaterialTheme.typography.titleLarge,
                 fontSize = 20.sp
