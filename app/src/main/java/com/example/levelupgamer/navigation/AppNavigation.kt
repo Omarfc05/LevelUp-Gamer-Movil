@@ -2,6 +2,8 @@ package com.example.levelupgamer.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -25,14 +27,23 @@ import com.example.levelupgamer.viewmodel.ProductViewModel
 fun AppNavigation(navController: NavHostController) {
     val context = LocalContext.current
 
+
     val db = AppDatabase.getDatabase(context)
     val userRepo = UserRepository(db.userDao())
     val currentUserRepo = CurrentUserRepository(db.currentUserDao())
     val authFactory = AuthViewModelFactory(userRepo, currentUserRepo)
 
     val cartViewModel: CartViewModel = viewModel()
-    val productViewModel: ProductViewModel = viewModel()
+
     val apiProductViewModel: ApiProductViewModel = viewModel()
+
+    val productViewModel: ProductViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ProductViewModel(db.productDao()) as T
+            }
+        }
+    )
 
     NavHost(
         navController = navController,
@@ -84,4 +95,5 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
     }
+
 }

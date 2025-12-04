@@ -9,15 +9,20 @@ import com.example.levelupgamer.data.local.dao.UserDao
 import com.example.levelupgamer.data.local.entity.CurrentUser
 import com.example.levelupgamer.data.local.entity.User
 
+// ... imports
+import com.example.levelupgamer.model.Product
+import com.example.levelupgamer.data.local.dao.ProductDao
+
 @Database(
-    entities = [User::class, CurrentUser::class],
-    version = 2,
+    entities = [User::class, CurrentUser::class, Product::class],
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
     abstract fun currentUserDao(): CurrentUserDao
+    abstract fun productDao(): ProductDao // <-- Agregamos el DAO aquí
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
@@ -28,7 +33,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "levelup_gamer_db"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration() //
+                    .build()
                 INSTANCE = instance
                 instance
             }
